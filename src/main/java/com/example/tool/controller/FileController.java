@@ -49,10 +49,13 @@ public class FileController {
         FileMetadata metadata = fileService.getMetadata(id);
         Resource resource    = fileService.download(id);
 
+        String sanitizedFilename = metadata.getOriginalName()
+                .replaceAll("[^a-zA-Z0-9._-]", "_");
+
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(metadata.getFileType()))
                 .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=\"" + metadata.getOriginalName() + "\"")
+                        "attachment; filename=\"" + sanitizedFilename + "\"")
                 .body(resource);
     }
 }
