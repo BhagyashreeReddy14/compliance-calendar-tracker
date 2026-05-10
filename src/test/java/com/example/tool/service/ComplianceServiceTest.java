@@ -38,6 +38,9 @@ class ComplianceServiceTest {
     @Mock
     private EmailService emailService;
 
+    @Mock
+    private AuditService auditService;
+
     @InjectMocks
     private ComplianceService complianceService;
 

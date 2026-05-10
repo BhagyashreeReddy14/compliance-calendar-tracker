@@ -37,30 +37,22 @@ public class EmailService {
 
     @Async
     public void sendComplianceCreatedEmail(String to, Compliance compliance) {
-        try {
-            Context ctx = new Context();
-            ctx.setVariable("title",       compliance.getTitle());
-            ctx.setVariable("description", compliance.getDescription());
-            ctx.setVariable("status",      compliance.getStatus());
-            ctx.setVariable("dueDate",     compliance.getDueDate());
-            String content = templateEngine.process("emails/compliance-created", ctx);
-            sendEmail(to, "New Compliance Record Created: " + compliance.getTitle(), content);
-        } catch (MessagingException e) {
-            log.error("Failed to send compliance-created email for id: {}", compliance.getId(), e);
-        }
+        Context ctx = new Context();
+        ctx.setVariable("title",       compliance.getTitle());
+        ctx.setVariable("description", compliance.getDescription());
+        ctx.setVariable("status",      compliance.getStatus());
+        ctx.setVariable("dueDate",     compliance.getDueDate());
+        String content = templateEngine.process("emails/compliance-created", ctx);
+        sendEmail(to, "New Compliance Record Created: " + compliance.getTitle(), content);
     }
 
     @Async
     public void sendOverdueEmail(String to, Compliance compliance) {
-        try {
-            Context ctx = new Context();
-            ctx.setVariable("title",   compliance.getTitle());
-            ctx.setVariable("dueDate", compliance.getDueDate());
-            ctx.setVariable("status",  compliance.getStatus());
-            String content = templateEngine.process("emails/compliance-overdue", ctx);
-            sendEmail(to, "Overdue Compliance Alert: " + compliance.getTitle(), content);
-        } catch (MessagingException e) {
-            log.error("Failed to send overdue email for id: {}", compliance.getId(), e);
-        }
+        Context ctx = new Context();
+        ctx.setVariable("title",   compliance.getTitle());
+        ctx.setVariable("dueDate", compliance.getDueDate());
+        ctx.setVariable("status",  compliance.getStatus());
+        String content = templateEngine.process("emails/compliance-overdue", ctx);
+        sendEmail(to, "Overdue Compliance Alert: " + compliance.getTitle(), content);
     }
 }

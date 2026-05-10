@@ -21,6 +21,10 @@ public class User {
     @Column(nullable = false, unique = true)
     private String username;
 
+    /** Optional email address — unique when provided. */
+    @Column(unique = true)
+    private String email;
+
     @Column(nullable = false)
     private String password;
 

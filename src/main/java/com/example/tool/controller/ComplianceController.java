@@ -2,6 +2,7 @@ package com.example.tool.controller;
 
 import com.example.tool.dto.ComplianceRequest;
 import com.example.tool.dto.ComplianceResponse;
+import com.example.tool.service.AiServiceClient;
 import com.example.tool.service.ComplianceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -30,6 +31,7 @@ import java.util.Map;
 public class ComplianceController {
 
     private final ComplianceService complianceService;
+    private final AiServiceClient    aiServiceClient;
 
     @Operation(
             summary = "Get all compliance records",
@@ -144,5 +146,35 @@ public class ComplianceController {
     @GetMapping("/stats")
     public ResponseEntity<Map<String, Long>> stats() {
         return ResponseEntity.ok(complianceService.getStats());
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // AI INTEGRATION
+    // ─────────────────────────────────────────────────────────────────────────
+
+    @PostMapping("/describe")
+    @Operation(summary = "Get AI-generated description for compliance text")
+    public ResponseEntity<Map<String, String>> describe(@RequestBody Map<String, String> body) {
+        String result = aiServiceClient.describe(body.get("text"));
+        return ResponseEntity.ok(Map.of("description", result));
+    }
+
+    @PostMapping("/recommend")
+    @Operation(summary = "Get AI recommendations for compliance actions")
+    public ResponseEntity<Map<String, String>> recommend(@RequestBody Map<String, String> body) {
+        String result = aiServiceClient.recommend(body.get("text"));
+        return ResponseEntity.ok(Map.of("recommendation", result));
+    }
+
+    @PostMapping("/generate-report")
+    @Operation(summary = "Generate a PDF report using AI")
+    public ResponseEntity<byte[]> generateReport(@RequestBody Map<String, Object> data) {
+        byte[] pdf = aiServiceClient.generateReport(data);
+        if (pdf == null) return ResponseEntity.internalServerError().build();
+
+        return ResponseEntity.ok()
+                .header("Content-Type", "application/pdf")
+                .header("Content-Disposition", "attachment; filename=compliance-report.pdf")
+                .body(pdf);
     }
 }

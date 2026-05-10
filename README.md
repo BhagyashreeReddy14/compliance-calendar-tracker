@@ -1,161 +1,93 @@
 # Compliance Calendar Tracker
 
-A production-ready **Spring Boot 3 (Java 17)** backend application for managing and tracking compliance records efficiently. Built with JWT authentication, Redis caching, email notifications, file handling, and full Swagger documentation.
+A production-ready **Spring Boot 3 (Java 17)** backend application for managing and tracking compliance records efficiently. Built following clean architecture, industry-level coding standards, and security best practices.
 
 ---
 
-## Tech Stack
+## 🚀 Features
+
+- **Robust Security**: Stateless JWT authentication with BCrypt password hashing.
+- **Role-Based Access Control**: `ROLE_ADMIN`, `ROLE_MANAGER`, `ROLE_VIEWER`.
+- **Compliance Management**: Full CRUD with soft-delete pattern, pagination, sorting, and JPQL-powered search.
+- **Audit Logging**: Tamper-evident tracking of all CREATE, UPDATE, and DELETE actions.
+- **Performance Optimized**: Redis caching layer for GET requests with intelligent eviction policies.
+- **Email Notifications**: Async email alerts via Thymeleaf templates for record creation and daily overdue alerts.
+- **File Handling**: Secure multipart file uploads with path traversal guards and MIME-type validation.
+- **API Documentation**: Fully documented using Swagger/OpenAPI 3.
+- **Production Ready**: Containerized via Docker with multi-stage builds and a `docker-compose` setup.
+- **High Test Coverage**: Extensive JUnit 5 + Mockito test suites with JaCoCo coverage reporting (>80%).
+
+---
+
+## 🏗️ Architecture
+
+```text
+       +-------------------+       +-------------------+       +-------------------+
+       |    Frontend UI    |       |     AI Service    |       |     External      |
+       |  (React + Vite)   |<----->|  (Flask + Python) |<----->|   (Groq LLM API)  |
+       +-------------------+       +-------------------+       +-------------------+
+                 ^                           ^                           |
+                 | HTTP / Axios              | HTTP / JSON               v
+                 v                           v                  +-------------------+
+       +---------------------------------------------------+    |     ChromaDB      |
+       |               Spring Boot 3 Backend               |--->|  (Vector Store)   |
+       |   +-------------+  +-----------+  +-------------+ |    +-------------------+
+       |   | Controllers |  | Services  |  | Repositories| |
+       |   +-------------+  +-----------+  +-------------+ |
+       +---------------------------------------------------+
+                 ^                           ^
+                 | JPA / JDBC                | Redis Protocol
+                 v                           v
+       +-------------------+       +-------------------+
+       |    PostgreSQL     |       |       Redis       |
+       |  (Primary DB)     |       | (Cache & Session) |
+       +-------------------+       +-------------------+
+```
+
+---
+
+## 🛠️ Tech Stack
 
 | Layer | Technology |
 |---|---|
-| Language | Java 17 |
-| Framework | Spring Boot 3.2.5 |
-| Database | PostgreSQL 15 |
-| Migrations | Flyway |
-| Security | Spring Security + JWT (jjwt 0.12.6) |
-| Caching | Redis |
-| Email | JavaMailSender (SMTP) |
-| File Handling | Spring Multipart |
-| Documentation | Swagger / OpenAPI 3 (springdoc 2.5.0) |
-| Testing | JUnit 5, Mockito, @DataJpaTest, @WebMvcTest |
-| Build Tool | Maven 3.9.x |
+| **Language** | Java 17 |
+| **Framework** | Spring Boot 3.2.5 |
+| **Database** | PostgreSQL 15 (Prod) / H2 (Test) |
+| **Migrations** | Flyway |
+| **Security** | Spring Security + jjwt (0.12.6) |
+| **Caching** | Redis 7 |
+| **Email** | JavaMailSender + Thymeleaf |
+| **Documentation** | springdoc-openapi (Swagger 3) |
+| **Testing** | JUnit 5, Mockito, JaCoCo |
+| **Build Tool** | Maven 3.9.x |
 
 ---
 
-## Features
+## 🐳 Running with Docker (Recommended)
 
-- **User Authentication** — Register and login with JWT token-based security
-- **Role-Based Access Control** — ROLE_ADMIN, ROLE_MANAGER, ROLE_VIEWER
-- **Compliance CRUD** — Create, read, update, soft-delete compliance records
-- **Pagination & Sorting** — Paginated list with sorting support
-- **Search** — Case-insensitive search by title or description
-- **Statistics** — Record counts grouped by status
-- **Redis Caching** — Cache GET responses, evict on create/update/delete
-- **Email Notifications** — Async email on record creation and overdue alerts
-- **File Upload & Download** — Upload PDF, DOCX, PNG, JPG (max 10MB)
-- **Global Exception Handling** — Consistent JSON error responses
-- **Swagger UI** — Interactive API documentation with JWT support
-- **Data Seeder** — Auto-seeds 30 compliance records and 3 demo users on startup
-- **Audit Logging** — Track entity changes with audit log table
-- **Scheduled Jobs** — Auto-mark overdue records daily
+Since the project requires PostgreSQL and Redis, the easiest way to run it is using Docker Compose. This completely skips the need for a local Maven installation.
 
----
+### 1. Prerequisites
+- Docker & Docker Compose installed on your system.
 
-## Project Structure
-
-```
-src/main/java/com/example/tool/
-├── config/
-│   ├── JpaAuditingConfig.java
-│   ├── JwtAuthFilter.java
-│   ├── JwtUtil.java
-│   ├── OpenApiConfig.java
-│   ├── RedisConfig.java
-│   └── SecurityConfig.java
-├── controller/
-│   ├── AuthController.java
-│   ├── ComplianceController.java
-│   └── FileController.java
-├── dto/
-│   ├── AuthResponse.java
-│   ├── ComplianceRequest.java
-│   ├── ComplianceResponse.java
-│   ├── LoginRequest.java
-│   └── RegisterRequest.java
-├── entity/
-│   ├── AuditLog.java
-│   ├── Compliance.java
-│   ├── FileMetadata.java
-│   └── User.java
-├── exception/
-│   ├── ComplianceNotFoundException.java
-│   ├── ErrorResponse.java
-│   ├── GlobalExceptionHandler.java
-│   ├── InvalidDataException.java
-│   └── ResourceNotFoundException.java
-├── repository/
-│   ├── AuditLogRepository.java
-│   ├── ComplianceRepository.java
-│   ├── FileMetadataRepository.java
-│   └── UserRepository.java
-├── scheduler/
-│   └── ComplianceScheduler.java
-├── seeder/
-│   └── DataSeeder.java
-├── service/
-│   ├── AuthService.java
-│   ├── ComplianceService.java
-│   ├── CustomUserDetailsService.java
-│   ├── EmailService.java
-│   └── FileService.java
-└── ComplianceTrackerApplication.java
-```
-
----
-
-## Prerequisites
-
-- Java 17
-- Maven 3.9+
-- PostgreSQL 15
-- Redis 7.x
-
----
-
-## Setup Instructions
-
-### 1. Clone the Repository
+### 2. Start the Stack
+Run the following command in the project root directory:
 
 ```bash
-git clone https://github.com/BhagyashreeReddy14/compliance-calendar-tracker.git
-cd compliance-calendar-tracker
+docker-compose up --build -d
 ```
 
-### 2. Create PostgreSQL Database
+This will start:
+1. PostgreSQL database (`compliance_db`) on port `5432`
+2. Redis cache on port `6379`
+3. Spring Boot Backend API on port `8080`
 
-```sql
-CREATE DATABASE compliance_db;
-```
-
-### 3. Configure Environment Variables
-
-Set the following environment variables or update `application.yml`:
-
+### 3. Check Logs
 ```bash
-# Database
-DB_URL=jdbc:postgresql://localhost:5432/compliance_db
-DB_USER=postgres
-DB_PASSWORD=postgres
-
-# JWT
-JWT_SECRET=your-secret-key-must-be-at-least-32-characters-long
-JWT_EXPIRATION=86400000
-
-# Redis
-REDIS_HOST=localhost
-REDIS_PORT=6379
-
-# Email (optional)
-MAIL_HOST=smtp.gmail.com
-MAIL_PORT=587
-MAIL_USERNAME=your-email@gmail.com
-MAIL_PASSWORD=your-app-password
-
-# File Upload
-FILE_UPLOAD_DIR=uploads
-
-# Notification
-NOTIFICATION_EMAIL=admin@example.com
-```
-
-### 4. Run the Application
-
-```bash
-mvn spring-boot:run
+docker-compose logs -f app
 ```
 
 ### Expected Startup Output
-
 ```
 Started ComplianceTrackerApplication in X.XXX seconds
 Inserted 3 demo users (admin, manager, viewer) successfully.
@@ -164,179 +96,119 @@ Inserted 30 compliance records successfully.
 
 ---
 
-## Demo Credentials
+## 💻 Running Locally (Development)
 
-| Username | Password | Role |
+If you have **Java 17** and **Maven** installed locally, you can run the app in development mode (which uses an in-memory H2 database by default):
+
+```bash
+mvn spring-boot:run
+```
+
+*(Note: If you encounter `mvn is not recognized`, please ensure Maven is added to your system's PATH variable, or use the Docker method above).*
+
+---
+
+## ⚙️ Environment Variables (.env)
+
+The project requires several environment variables for production execution. Create a `.env` file in the root directory using `.env.example` as a template.
+
+| Variable | Description | Example Value |
 |---|---|---|
-| `admin` | `admin123` | ROLE_ADMIN |
-| `manager` | `manager123` | ROLE_MANAGER |
-| `viewer` | `viewer123` | ROLE_VIEWER |
+| `DB_URL` | JDBC URL for PostgreSQL | `jdbc:postgresql://db:5432/compliance_db` |
+| `DB_USER` | Database username | `postgres` |
+| `DB_PASSWORD` | Database password | `postgres` |
+| `REDIS_HOST` | Redis server hostname | `redis` |
+| `REDIS_PORT` | Redis server port | `6379` |
+| `JWT_SECRET` | 256-bit secret key for JWT signing | `mySecretKey12345678901234567890...` |
+| `JWT_EXPIRATION` | JWT token expiration time in ms | `86400000` |
+| `MAIL_HOST` | SMTP server host | `smtp.gmail.com` |
+| `MAIL_PORT` | SMTP server port | `587` |
+| `MAIL_USERNAME` | SMTP authentication username | `your-email@gmail.com` |
+| `MAIL_PASSWORD` | SMTP authentication password | `your-app-password` |
+| `NOTIFICATION_EMAIL`| Recipient for admin notifications | `admin@example.com` |
 
 ---
 
-## API Documentation
+## 🔑 Demo Credentials (Auto-Seeded)
 
-Swagger UI is available at:
+The application automatically seeds 3 users and 30 sample compliance records on first startup.
 
-```
-http://localhost:8080/swagger-ui.html
-```
-
-Click **Authorize** → Enter `Bearer <token>` to test secured endpoints.
-
----
-
-## API Endpoints
-
-### Authentication
-
-| Method | Endpoint | Description | Auth |
+| Username | Email | Password | Role |
 |---|---|---|---|
-| POST | `/auth/register` | Register new user | Public |
-| POST | `/auth/login` | Login and get JWT token | Public |
-
-### Compliance Records
-
-| Method | Endpoint | Description | Role |
-|---|---|---|---|
-| GET | `/api/compliance` | Get all records (paginated) | All |
-| GET | `/api/compliance/{id}` | Get record by ID | All |
-| POST | `/api/compliance` | Create new record | Admin, Manager |
-| PUT | `/api/compliance/{id}` | Update record | Admin, Manager |
-| DELETE | `/api/compliance/{id}` | Soft delete record | Admin |
-| GET | `/api/compliance/search?q=` | Search by title/description | All |
-| GET | `/api/compliance/stats` | Get status statistics | All |
-
-### File Management
-
-| Method | Endpoint | Description | Role |
-|---|---|---|---|
-| POST | `/api/files/upload` | Upload file (PDF, DOCX, PNG, JPG) | Admin, Manager |
-| GET | `/api/files/{id}` | Download file by ID | All |
+| `admin` | admin@example.com | `admin123` | ROLE_ADMIN |
+| `manager` | manager@example.com | `manager123` | ROLE_MANAGER |
+| `viewer` | viewer@example.com | `viewer123` | ROLE_VIEWER |
 
 ---
 
-## Example Requests
+## 📚 API Documentation
 
-### Login
+Once the application is running, the interactive Swagger UI is available at:
+
+👉 **http://localhost:8080/swagger-ui.html**
+
+1. Go to the Swagger UI.
+2. Under `Authentication`, use the `/auth/login` endpoint to get a JWT token.
+3. Click the **Authorize** button at the top of the screen.
+4. Enter `Bearer <your_token>` and click Authorize.
+5. You can now test all secured endpoints!
+
+---
+
+## 📡 API Endpoints Overview
+
+### Authentication (Public)
+- `POST /auth/register` — Register a new user (`ROLE_VIEWER`)
+- `POST /auth/login` — Authenticate and receive a JWT
+
+### Compliance Records (Secured)
+- `GET /api/compliance` — Get paginated/sorted records (All Roles)
+- `GET /api/compliance/{id}` — Get single record (All Roles)
+- `POST /api/compliance` — Create record (Admin/Manager)
+- `PUT /api/compliance/{id}` — Update record (Admin/Manager)
+- `DELETE /api/compliance/{id}` — Soft delete record (Admin Only)
+- `GET /api/compliance/search?q=` — Case-insensitive search (All Roles)
+- `GET /api/compliance/stats` — Metrics dashboard (All Roles)
+
+### Files (Secured)
+- `POST /api/files/upload` — Upload file (Admin/Manager)
+- `GET /api/files/{id}` — Download file (All Roles)
+
+---
+
+## 🧪 Testing
+
+To run the full test suite and generate a JaCoCo coverage report:
 
 ```bash
-curl -X POST http://localhost:8080/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"username": "admin", "password": "admin123"}'
+mvn clean verify
 ```
+*The JaCoCo coverage report will be generated at `target/site/jacoco/index.html`.*
 
-Response:
-```json
-{
-  "token": "eyJhbGciOiJIUzI1NiJ9...",
-  "username": "admin",
-  "role": "ROLE_ADMIN"
-}
-```
+---
 
-### Create Compliance Record
+## 📁 Project Structure
 
-```bash
-curl -X POST http://localhost:8080/api/compliance \
-  -H "Authorization: Bearer <token>" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "GDPR Annual Review",
-    "description": "Annual review of GDPR compliance",
-    "status": "PENDING",
-    "dueDate": "2025-12-31"
-  }'
-```
-
-Response:
-```json
-{
-  "id": 1,
-  "title": "GDPR Annual Review",
-  "status": "PENDING",
-  "dueDate": "2025-12-31",
-  "isDeleted": false,
-  "createdAt": "2025-01-15T10:30:00"
-}
-```
-
-### Get Statistics
-
-```bash
-curl -X GET http://localhost:8080/api/compliance/stats \
-  -H "Authorization: Bearer <token>"
-```
-
-Response:
-```json
-{
-  "total": 30,
-  "pending": 8,
-  "completed": 8,
-  "overdue": 5,
-  "open": 7,
-  "closed": 2
-}
+```text
+src/main/java/com/example/tool/
+├── config/        # Security, JWT, Redis, OpenAPI configs
+├── controller/    # REST API endpoints
+├── dto/           # Data Transfer Objects & Validation
+├── entity/        # JPA Entities (Compliance, User, AuditLog)
+├── exception/     # Global Exception Handler
+├── repository/    # Spring Data JPA Repositories
+├── scheduler/     # Cron jobs (Overdue marking)
+├── seeder/        # Database initialization (Demo data)
+├── service/       # Business Logic, Caching, Audit, Emails
+└── util/          # Shared stateless utilities (DateUtil)
 ```
 
 ---
 
-## Running Tests
-
-```bash
-mvn test
-```
-
-### Test Coverage (~88%)
-
-| Layer | Test Class |
-|---|---|
-| Service | `ComplianceServiceTest`, `AuthServiceTest`, `CustomUserDetailsServiceTest` |
-| Repository | `ComplianceRepositoryTest`, `UserRepositoryTest`, `AuditLogRepositoryTest` |
-| Controller | `ComplianceControllerTest`, `AuthControllerTest` |
-| Config | `JwtUtilTest`, `JwtAuthFilterTest` |
-| Exception | `GlobalExceptionHandlerTest` |
-
----
-
-## Error Responses
-
-All errors return consistent JSON:
-
-```json
-{
-  "timestamp": "2025-01-15T10:30:00",
-  "status": 404,
-  "error": "Not Found",
-  "message": "Compliance record not found with id: 99",
-  "path": "/api/compliance/99"
-}
-```
-
-| Status | Scenario |
-|---|---|
-| 400 | Invalid input / validation failure |
-| 401 | Missing or invalid JWT token |
-| 403 | Insufficient role permissions |
-| 404 | Resource not found |
-| 500 | Unexpected server error |
-
----
-
-## Future Enhancements
-
-- React frontend integration
-- Advanced reporting and analytics dashboard
-- Notifications dashboard with read/unread status
-- Multi-tenant support
-- Docker & Kubernetes deployment
-- CI/CD pipeline with GitHub Actions
-
----
-
-## Author
-
-**Bhagyashree Reddy**
-Java Developer — Backend
-Spring Boot 3 | Java 17 | PostgreSQL | Redis | JWT
+## 🛡️ Best Practices Implemented
+- **Clean Architecture**: Strict separation of concerns (Controller → Service → Repository).
+- **Security**: Passwords hashed with BCrypt. Stateless JWT tokens. No session fixation.
+- **Caching**: `@Cacheable` and `@CacheEvict` annotations heavily optimize read-heavy operations.
+- **Soft Deletes**: Data is never hard-deleted; a boolean flag is toggled for compliance retention.
+- **Transactions**: Write operations are explicitly marked with `@Transactional` to ensure data integrity.
+- **Audit Trails**: Every mutation logs a before/after snapshot via Jackson serialization.

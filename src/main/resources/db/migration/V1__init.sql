@@ -4,6 +4,7 @@ CREATE TABLE compliance (
     description TEXT,
     status VARCHAR(50) NOT NULL DEFAULT 'PENDING',
     due_date DATE,
+    risk_score INT DEFAULT 0,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );

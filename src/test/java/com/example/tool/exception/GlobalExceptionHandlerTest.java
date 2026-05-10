@@ -18,22 +18,23 @@ import org.springframework.web.bind.annotation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(GlobalExceptionHandlerTest.TestController.class)
-@Import(GlobalExceptionHandler.class)
+import org.junit.jupiter.api.BeforeEach;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
 class GlobalExceptionHandlerTest {
 
-    @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
-    private JwtUtil jwtUtil;
-
-    @MockBean
-    private JwtAuthFilter jwtAuthFilter;
+    @BeforeEach
+    void setUp() {
+        mockMvc = MockMvcBuilders.standaloneSetup(new TestController())
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .build();
+    }
 
     @RestController
     @RequestMapping("/test-ex")
-    static class TestController {
+    public static class TestController {
 
         @GetMapping("/not-found")
         public void notFound() {

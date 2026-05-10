@@ -35,16 +35,17 @@ public class DataSeeder implements CommandLineRunner {
         }
         log.info("Seeding demo users...");
         userRepository.saveAll(List.of(
-                buildUser("admin",   "admin123",   "ROLE_ADMIN"),
-                buildUser("manager", "manager123", "ROLE_MANAGER"),
-                buildUser("viewer",  "viewer123",  "ROLE_VIEWER")
+                buildUser("admin",   "admin@example.com",   "admin123",   "ROLE_ADMIN"),
+                buildUser("manager", "manager@example.com", "manager123", "ROLE_MANAGER"),
+                buildUser("viewer",  "viewer@example.com",  "viewer123",  "ROLE_VIEWER")
         ));
         log.info("Inserted 3 demo users (admin, manager, viewer) successfully.");
     }
 
-    private User buildUser(String username, String rawPassword, String role) {
+    private User buildUser(String username, String email, String rawPassword, String role) {
         User u = new User();
         u.setUsername(username);
+        u.setEmail(email);
         u.setPassword(passwordEncoder.encode(rawPassword));
         u.setRole(role);
         return u;
@@ -59,48 +60,49 @@ public class DataSeeder implements CommandLineRunner {
         LocalDate today = LocalDate.now();
 
         List<Compliance> records = List.of(
-                build("GST Filing Q1",               "Quarterly GST return filing for Q1",                     "PENDING",   today.plusDays(10)),
-                build("GST Filing Q2",               "Quarterly GST return filing for Q2",                     "PENDING",   today.plusDays(40)),
-                build("Income Tax Return",           "Annual income tax return submission",                     "PENDING",   today.plusDays(20)),
-                build("TDS Payment - March",         "Monthly TDS payment for March",                          "PENDING",   today.plusDays(5)),
-                build("PF Contribution Filing",      "Monthly provident fund contribution filing",             "PENDING",   today.plusDays(15)),
-                build("ESI Return Filing",           "Employee state insurance return filing",                 "PENDING",   today.plusDays(25)),
-                build("ROC Annual Filing",           "Registrar of Companies annual return filing",            "PENDING",   today.plusDays(60)),
-                build("FSSAI License Renewal",       "Food safety and standards authority license renewal",    "PENDING",   today.plusDays(90)),
-                build("ISO 27001 Audit",             "Annual information security management audit",           "OPEN",      today.plusDays(30)),
-                build("GDPR Compliance Review",      "Annual GDPR data processing activities review",         "OPEN",      today.plusDays(45)),
-                build("Data Privacy Assessment",     "Internal data privacy impact assessment",               "OPEN",      today.plusDays(35)),
-                build("Cybersecurity Policy Review", "Review and update cybersecurity policies",              "OPEN",      today.plusDays(50)),
-                build("Fire Safety Inspection",      "Annual fire safety equipment inspection",               "OPEN",      today.plusDays(55)),
-                build("Environmental Compliance",    "Environmental impact compliance check",                 "OPEN",      today.plusDays(70)),
-                build("Trade License Renewal",       "Annual trade license renewal with municipal authority", "OPEN",      today.plusDays(80)),
-                build("Q3 GST Filing",               "Quarterly GST return filing for Q3",                    "COMPLETED", today.minusDays(10)),
-                build("Annual HR Policy Review",     "Yearly HR policy and handbook review",                  "COMPLETED", today.minusDays(20)),
-                build("Payroll Audit",               "Internal payroll audit for FY 2024",                    "COMPLETED", today.minusDays(30)),
-                build("Vendor Contract Review",      "Annual vendor contract compliance review",              "COMPLETED", today.minusDays(15)),
-                build("Software License Audit",      "Audit of all software licenses in use",                 "COMPLETED", today.minusDays(25)),
-                build("POSH Training",               "Prevention of sexual harassment training completion",   "COMPLETED", today.minusDays(40)),
-                build("Board Meeting Minutes",       "Filing of board meeting minutes with ROC",              "COMPLETED", today.minusDays(5)),
-                build("Statutory Audit FY2024",      "Annual statutory audit for financial year 2024",        "COMPLETED", today.minusDays(60)),
-                build("TDS Return Q4",               "TDS return filing for Q4",                              "OVERDUE",   today.minusDays(3)),
-                build("Shop Act License Renewal",    "Shop and establishment act license renewal",            "OVERDUE",   today.minusDays(7)),
-                build("Professional Tax Filing",     "Professional tax filing for employees",                 "OVERDUE",   today.minusDays(12)),
-                build("Import Export Code Renewal",  "IEC renewal with DGFT",                                 "OVERDUE",   today.minusDays(18)),
-                build("Trademark Renewal",           "Trademark registration renewal",                        "OVERDUE",   today.minusDays(22)),
-                build("Q2 Payroll Compliance",       "Payroll compliance check for Q2",                       "CLOSED",    today.minusDays(45)),
-                build("Annual Compliance Report",    "Submission of annual compliance report to board",       "CLOSED",    today.minusDays(90))
+                build("GST Filing Q1",               "Quarterly GST return filing for Q1",                     "PENDING",   today.plusDays(10), 85),
+                build("GST Filing Q2",               "Quarterly GST return filing for Q2",                     "PENDING",   today.plusDays(40), 80),
+                build("Income Tax Return",           "Annual income tax return submission",                     "PENDING",   today.plusDays(20), 95),
+                build("TDS Payment - March",         "Monthly TDS payment for March",                          "PENDING",   today.plusDays(5),  90),
+                build("PF Contribution Filing",      "Monthly provident fund contribution filing",             "PENDING",   today.plusDays(15), 75),
+                build("ESI Return Filing",           "Employee state insurance return filing",                 "PENDING",   today.plusDays(25), 70),
+                build("ROC Annual Filing",           "Registrar of Companies annual return filing",            "PENDING",   today.plusDays(60), 85),
+                build("FSSAI License Renewal",       "Food safety and standards authority license renewal",    "PENDING",   today.plusDays(90), 60),
+                build("ISO 27001 Audit",             "Annual information security management audit",           "OPEN",      today.plusDays(30), 88),
+                build("GDPR Compliance Review",      "Annual GDPR data processing activities review",         "OPEN",      today.plusDays(45), 92),
+                build("Data Privacy Assessment",     "Internal data privacy impact assessment",               "OPEN",      today.plusDays(35), 85),
+                build("Cybersecurity Policy Review", "Review and update cybersecurity policies",              "OPEN",      today.plusDays(50), 80),
+                build("Fire Safety Inspection",      "Annual fire safety equipment inspection",               "OPEN",      today.plusDays(55), 95),
+                build("Environmental Compliance",    "Environmental impact compliance check",                 "OPEN",      today.plusDays(70), 75),
+                build("Trade License Renewal",       "Annual trade license renewal with municipal authority", "OPEN",      today.plusDays(80), 65),
+                build("Q3 GST Filing",               "Quarterly GST return filing for Q3",                    "COMPLETED", today.minusDays(10), 80),
+                build("Annual HR Policy Review",     "Yearly HR policy and handbook review",                  "COMPLETED", today.minusDays(20), 60),
+                build("Payroll Audit",               "Internal payroll audit for FY 2024",                    "COMPLETED", today.minusDays(30), 85),
+                build("Vendor Contract Review",      "Annual vendor contract compliance review",              "COMPLETED", today.minusDays(15), 70),
+                build("Software License Audit",      "Audit of all software licenses in use",                 "COMPLETED", today.minusDays(25), 75),
+                build("POSH Training",               "Prevention of sexual harassment training completion",   "COMPLETED", today.minusDays(40), 90),
+                build("Board Meeting Minutes",       "Filing of board meeting minutes with ROC",              "COMPLETED", today.minusDays(5),  65),
+                build("Statutory Audit FY2024",      "Annual statutory audit for financial year 2024",        "COMPLETED", today.minusDays(60), 95),
+                build("TDS Return Q4",               "TDS return filing for Q4",                              "OVERDUE",   today.minusDays(3),  90),
+                build("Shop Act License Renewal",    "Shop and establishment act license renewal",            "OVERDUE",   today.minusDays(7),  65),
+                build("Professional Tax Filing",     "Professional tax filing for employees",                 "OVERDUE",   today.minusDays(12), 75),
+                build("Import Export Code Renewal",  "IEC renewal with DGFT",                                 "OVERDUE",   today.minusDays(18), 85),
+                build("Trademark Renewal",           "Trademark registration renewal",                        "OVERDUE",   today.minusDays(22), 70),
+                build("Q2 Payroll Compliance",       "Payroll compliance check for Q2",                       "CLOSED",    today.minusDays(45), 80),
+                build("Annual Compliance Report",    "Submission of annual compliance report to board",       "CLOSED",    today.minusDays(90), 90)
         );
 
         complianceRepository.saveAll(records);
         log.info("Inserted {} compliance records successfully.", records.size());
     }
 
-    private Compliance build(String title, String description, String status, LocalDate dueDate) {
+    private Compliance build(String title, String description, String status, LocalDate dueDate, int riskScore) {
         Compliance c = new Compliance();
         c.setTitle(title);
         c.setDescription(description);
         c.setStatus(status);
         c.setDueDate(dueDate);
+        c.setRiskScore(riskScore);
         c.setDeleted(false);
         return c;
     }

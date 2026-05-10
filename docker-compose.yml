@@ -1,0 +1,94 @@
+version: "3.9"
+
+# ── Compliance Calendar Tracker — Full Stack Compose ──────────────────────────
+# Usage:
+#   docker-compose up -d            # Start all services
+#   docker-compose logs -f app      # Stream app logs
+#   docker-compose down -v          # Stop & remove volumes
+
+services:
+
+  # ── PostgreSQL ──────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    container_name: compliance_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       compliance_db
+      POSTGRES_USER:     ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d compliance_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Redis ───────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: compliance_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server --save 60 1 --loglevel warning
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Spring Boot Application ─────────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: compliance_app
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      # Database
+      DB_URL:      jdbc:postgresql://postgres:5432/compliance_db
+      DB_USER:     ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      # JWT — override in production!
+      JWT_SECRET:     ${JWT_SECRET:-mySecretKey1234567890123456789012345678901234567890}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
+      # Redis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      # Email (optional — app degrades gracefully when not set)
+      MAIL_HOST:     ${MAIL_HOST:-smtp.gmail.com}
+      MAIL_PORT:     ${MAIL_PORT:-587}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      # Notifications
+      NOTIFICATION_EMAIL: ${NOTIFICATION_EMAIL:-admin@example.com}
+      # File upload
+      FILE_UPLOAD_DIR: /app/uploads
+    volumes:
+      - uploads_data:/app/uploads
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+# ── Named Volumes ────────────────────────────────────────────────────────────
+volumes:
+  postgres_data:
+  redis_data:
+  uploads_data:

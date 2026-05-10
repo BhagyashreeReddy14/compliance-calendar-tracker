@@ -43,4 +43,8 @@ public interface ComplianceRepository extends JpaRepository<Compliance, Long> {
 
     // Legacy — kept for backward compat
     List<Compliance> findByStatus(String status);
+
+    // Reporting: active records with due date strictly before the given date
+    List<Compliance> findByIsDeletedFalseAndDueDateBefore(LocalDate date);
 }
+

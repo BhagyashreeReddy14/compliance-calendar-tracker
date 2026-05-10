@@ -1,0 +1,34 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+  flyway:
+    enabled: false
+  cache:
+    type: none
+  mail:
+    host: localhost
+    port: 1025
+
+jwt:
+  secret: mySecretKey1234567890123456789012345678901234567890
+  expiration: 86400000
+
+notification:
+  email:
+    recipient: admin@example.com
+
+file:
+  upload-dir: target/test-uploads
+
+# Disable scheduling during tests
+spring.task.scheduling.enabled: false

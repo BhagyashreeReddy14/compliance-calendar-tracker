@@ -30,4 +30,7 @@ public class ComplianceRequest {
     @Schema(description = "Due date for the compliance record (must not be in the past)", example = "2025-12-31",
             requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDate dueDate;
+
+    @Schema(description = "Risk score out of 100", example = "75")
+    private Integer riskScore = 0;
 }

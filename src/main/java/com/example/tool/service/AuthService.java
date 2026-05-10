@@ -14,23 +14,39 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Handles user registration and login, returning a signed JWT on success.
+ * New users are always assigned {@code ROLE_VIEWER} by default.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class AuthService {
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final UserRepository       userRepository;
+    private final PasswordEncoder      passwordEncoder;
     private final AuthenticationManager authenticationManager;
-    private final JwtUtil jwtUtil;
+    private final JwtUtil              jwtUtil;
 
+    /**
+     * Registers a new user account.
+     * Validates username uniqueness and (if provided) email uniqueness.
+     */
+    @Transactional
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
             throw new InvalidDataException("Username already exists");
         }
+        if (request.getEmail() != null && !request.getEmail().isBlank()
+                && userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new InvalidDataException("Email address already registered");
+        }
+
         User user = new User();
         user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole("ROLE_VIEWER");
         userRepository.save(user);
@@ -40,6 +56,9 @@ public class AuthService {
         return new AuthResponse(token, user.getUsername(), user.getRole());
     }
 
+    /**
+     * Authenticates an existing user and returns a fresh JWT.
+     */
     public AuthResponse login(LoginRequest request) {
         try {
             authenticationManager.authenticate(

@@ -38,6 +38,9 @@ public class Compliance implements Serializable {
     @Column(name = "due_date")
     private LocalDate dueDate;
 
+    @Column(name = "risk_score")
+    private Integer riskScore = 0;
+
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
 

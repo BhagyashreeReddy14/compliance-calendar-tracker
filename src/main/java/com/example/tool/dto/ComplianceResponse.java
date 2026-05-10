@@ -30,6 +30,9 @@ public class ComplianceResponse {
     @Schema(description = "Whether the record has been soft-deleted", example = "false")
     private final boolean isDeleted;
 
+    @Schema(description = "Risk score out of 100", example = "75")
+    private final Integer riskScore;
+
     @Schema(description = "Timestamp when the record was created", example = "2025-01-15T10:30:00")
     private final LocalDateTime createdAt;
 
@@ -42,6 +45,7 @@ public class ComplianceResponse {
         this.description = c.getDescription();
         this.status      = c.getStatus();
         this.dueDate     = c.getDueDate();
+        this.riskScore   = c.getRiskScore();
         this.isDeleted   = c.isDeleted();
         this.createdAt   = c.getCreatedAt();
         this.updatedAt   = c.getUpdatedAt();

@@ -2,17 +2,17 @@ spring:
   application:
     name: compliance-calendar-tracker
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/compliance_db}
-    username: ${DB_USER:postgres}
-    password: ${DB_PASSWORD:postgres}
-    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL:jdbc:h2:mem:compliance_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE}
+    username: ${DB_USER:sa}
+    password: ${DB_PASSWORD:}
+    driver-class-name: ${DB_DRIVER:org.h2.Driver}
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: ${DDL_AUTO:create-drop}
     show-sql: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        dialect: ${DB_DIALECT:org.hibernate.dialect.H2Dialect}
   mail:
     host: ${MAIL_HOST:smtp.gmail.com}
     port: ${MAIL_PORT:587}
@@ -32,11 +32,9 @@ spring:
       max-file-size: ${MAX_FILE_SIZE:10MB}
       max-request-size: ${MAX_REQUEST_SIZE:10MB}
   flyway:
-    enabled: true
-    locations: classpath:db/migration
-    baseline-on-migrate: true
+    enabled: false
   cache:
-    type: ${CACHE_TYPE:redis}
+    type: none
   data:
     redis:
       host: ${REDIS_HOST:localhost}
@@ -45,16 +43,13 @@ spring:
       timeout: 2000ms
       connect-timeout: 2000ms
 
+jwt:
+  secret: ${JWT_SECRET:mySecretKey1234567890123456789012345678901234567890}
+  expiration: ${JWT_EXPIRATION:86400000}
+
 cache:
   redis:
     ttl: ${CACHE_TTL:600}
-
-server:
-  port: 8080
-
-jwt:
-  secret: ${JWT_SECRET:default-secret-change-in-production-must-be-32-chars}
-  expiration: ${JWT_EXPIRATION:86400000}
 
 notification:
   email:

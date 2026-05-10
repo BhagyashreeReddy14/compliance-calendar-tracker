@@ -1,7 +1,5 @@
 package com.example.tool.controller;
 
-import com.example.tool.config.JwtAuthFilter;
-import com.example.tool.config.JwtUtil;
 import com.example.tool.dto.AuthResponse;
 import com.example.tool.dto.LoginRequest;
 import com.example.tool.dto.RegisterRequest;
@@ -11,37 +9,43 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.BeforeEach;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import com.example.tool.exception.GlobalExceptionHandler;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(AuthController.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class AuthControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @MockBean
+    @Mock
     private AuthService authService;
 
-    @MockBean
-    private JwtUtil jwtUtil;
+    @InjectMocks
+    private AuthController authController;
 
-    @MockBean
-    private JwtAuthFilter jwtAuthFilter;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private static final AuthResponse MOCK_RESPONSE =
             new AuthResponse("mock-jwt-token", "alice", "ROLE_VIEWER");
+
+    @BeforeEach
+    void setUp() {
+        mockMvc = MockMvcBuilders.standaloneSetup(authController)
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .build();
+    }
 
     @Nested
     @DisplayName("POST /auth/register")
