@@ -8,3 +8,8 @@ uploads/
 target/
 *.class
 *.jar
+*.log
+apache-maven-3.9.9/
+.mvn/
+app.log
+app_err.log
